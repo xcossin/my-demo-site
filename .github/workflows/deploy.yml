@@ -1,0 +1,33 @@
+name: 自动部署演示
+
+on:
+  push:
+    branches: ["main"] # 只要推送到 main 分支就触发
+
+# 赋予脚本写入仓库的权限（关键！）
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 拉取代码
+        uses: actions/checkout@v4
+
+      - name: 2. 安装 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: 3. 安装依赖并打包
+        run: |
+          npm install
+          npm run build
+        # 此时会生成 dist 文件夹
+
+      - name: 4. 把 dist 文件夹推送到 gh-pages 分支
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
